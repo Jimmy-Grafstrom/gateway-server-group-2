@@ -1,5 +1,11 @@
 package se.iths.gatewayservergroup2.controller;
 
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import se.iths.gatewayservergroup2.service.GatewayProxyService;
@@ -11,5 +17,14 @@ public class GatewayController {
 
     public GatewayController(GatewayProxyService proxyService) {
         this.proxyService = proxyService;
+    }
+
+    @PostMapping("/orders")
+    public ResponseEntity<String> createOrder(@RequestBody String requestBody, HttpServletRequest request) {
+        return proxyService.createOrder(
+                requestBody,
+                request.getHeader(HttpHeaders.AUTHORIZATION),
+                request.getHeader(HttpHeaders.CONTENT_TYPE)
+        );
     }
 }
