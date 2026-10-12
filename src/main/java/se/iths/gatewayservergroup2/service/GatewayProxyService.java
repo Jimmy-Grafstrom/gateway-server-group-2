@@ -17,16 +17,19 @@ public class GatewayProxyService {
     private final String authServerUrl;
     private final String productServiceUrl;
     private final String orderServiceUrl;
+    private final String paymentServiceUrl;
     private final HttpClient httpClient;
 
     public GatewayProxyService(
             @Value("${app.auth-server-url}") String authServerUrl,
             @Value("${app.product-service-url}") String productServiceUrl,
             @Value("${app.order-service-url}") String orderServiceUrl,
+            @Value("${app.payment-service-url}") String paymentServiceUrl,
             HttpClient httpClient) {
         this.authServerUrl = authServerUrl;
         this.productServiceUrl = productServiceUrl;
         this.orderServiceUrl = orderServiceUrl;
+        this.paymentServiceUrl = paymentServiceUrl;
         this.httpClient = httpClient;
     }
 
@@ -42,6 +45,20 @@ public class GatewayProxyService {
                 contentType
         );
 
+    }
+
+    public ResponseEntity<String> createPaymentCheckout(
+            String requestBody,
+            String authorization,
+            String contentType
+    ) {
+        return forwardPost(
+                paymentServiceUrl,
+                "/payment/checkout",
+                requestBody,
+                authorization,
+                contentType
+        );
     }
 
     /* HJÄLPMETODER */
@@ -93,6 +110,4 @@ public class GatewayProxyService {
                     .body("Anropet avbröts");
         }
     }
-
-
 }

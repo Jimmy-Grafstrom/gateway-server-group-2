@@ -19,9 +19,21 @@ public class GatewayController {
         this.proxyService = proxyService;
     }
 
-    @PostMapping("/orders")
+    @PostMapping("/order")
     public ResponseEntity<String> createOrder(@RequestBody String requestBody, HttpServletRequest request) {
         return proxyService.createOrder(
+                requestBody,
+                request.getHeader(HttpHeaders.AUTHORIZATION),
+                request.getHeader(HttpHeaders.CONTENT_TYPE)
+        );
+    }
+
+    @PostMapping("/payment/checkout")
+    public ResponseEntity<String> createPaymentCheckout(
+            @RequestBody String requestBody,
+            HttpServletRequest request
+    ) {
+        return proxyService.createPaymentCheckout(
                 requestBody,
                 request.getHeader(HttpHeaders.AUTHORIZATION),
                 request.getHeader(HttpHeaders.CONTENT_TYPE)
