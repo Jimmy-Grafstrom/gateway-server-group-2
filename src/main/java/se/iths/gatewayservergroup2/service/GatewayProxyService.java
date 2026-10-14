@@ -33,11 +33,11 @@ public class GatewayProxyService {
         this.httpClient = httpClient;
     }
 
-    public ResponseEntity<String> createOrder (
+    public ResponseEntity<String> createOrder(
             String requestBody,
             String authorization,
             String contentType) {
-        return forwardPost (
+        return forwardPost(
                 orderServiceUrl,
                 "/order",
                 requestBody,
@@ -86,21 +86,21 @@ public class GatewayProxyService {
                     authorization
             );
         }
-        try{
-        HttpResponse<String> response = httpClient.send(
-                builder.build(),
-                HttpResponse.BodyHandlers.ofString()
-        );
+        try {
+            HttpResponse<String> response = httpClient.send(
+                    builder.build(),
+                    HttpResponse.BodyHandlers.ofString()
+            );
 
-        ResponseEntity.BodyBuilder responseBuilder = ResponseEntity.status(response.statusCode());
+            ResponseEntity.BodyBuilder responseBuilder = ResponseEntity.status(response.statusCode());
 
-        response.headers()
-                .firstValue(HttpHeaders.CONTENT_TYPE)
-                .ifPresent(contentType -> responseBuilder.header(
-                        HttpHeaders.CONTENT_TYPE,
-                        contentType
-                ));
-        return responseBuilder.body(response.body());
+            response.headers()
+                    .firstValue(HttpHeaders.CONTENT_TYPE)
+                    .ifPresent(contentType -> responseBuilder.header(
+                            HttpHeaders.CONTENT_TYPE,
+                            contentType
+                    ));
+            return responseBuilder.body(response.body());
         } catch (IOException exception) {
             return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
                     .body("Kunde inte nå bakomliggande tjänst");
@@ -110,4 +110,43 @@ public class GatewayProxyService {
                     .body("Anropet avbröts");
         }
     }
+// =========================== Product Service Methods ===========================
+
+    public ResponseEntity<String> getAllProducts(String authorization) {
+        return forwardGet(productServiceUrl, "/api/products", authorization);
+    }
+
+    public ResponseEntity<String> getProductById(Long id, String authorization) {
+        return forwardGet(productServiceUrl, "/api/products/" + id, authorization);
+    }
+
+    public ResponseEntity<String> addProduct(String requestBody, String authorization, String contentType) {
+        return forwardPost(productServiceUrl, "/api/products/add", requestBody, authorization, contentType);
+    }
+
+    public ResponseEntity<String> deleteProduct(Long id, String authorization) {
+        return forwardDelete(productServiceUrl, "/api/products/delete/" + id, authorization);
+    }
+
+    private ResponseEntity<String> forwardGet(
+            String baseUrl,
+            String path,
+            String authorization) {
+        HttpRequest.Builder builder =
+                HttpRequest.newBuilder(URI.create(baseUrl + path))
+                        .GET();
+        return send(builder, authorization);
+    }
+
+    private ResponseEntity<String>
+    forwardDelete(
+            String baseUrl,
+            String path,
+            String authorization) {
+        HttpRequest.Builder builder =
+                HttpRequest.newBuilder(URI.create(baseUrl + path))
+                        .DELETE();
+        return send(builder, authorization);
+    }
+// ======================================================
 }
