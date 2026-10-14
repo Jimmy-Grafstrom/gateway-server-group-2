@@ -39,7 +39,7 @@ public class GatewayProxyService {
             String contentType) {
         return forwardPost (
                 orderServiceUrl,
-                "/orders",
+                "/order",
                 requestBody,
                 authorization,
                 contentType
