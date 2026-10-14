@@ -110,4 +110,41 @@ public class GatewayProxyService {
                     .body("Anropet avbröts");
         }
     }
+
+    public ResponseEntity<String> getAllProducts(String authorization) {
+        return forwardGet(productServiceUrl, "api/products", authorization);
+    }
+
+    public ResponseEntity<String> getProductById(Long id, String authorization) {
+        return forwardGet(productServiceUrl, "api/products/" + id, authorization);
+    }
+
+    public ResponseEntity<String> addProduct(String requestBody, String authorization, String contentType) {
+        return forwardPost(productServiceUrl, "api/products/add", requestBody, authorization, contentType);
+    }
+
+    public ResponseEntity<String> deleteProduct(Long id, String authorization) {
+        return forwardDelete(productServiceUrl, "api/products/" + id, authorization);
+    }
+    private ResponseEntity<String> forwardGet(
+            String baseUrl,
+            String path,
+            String authorization) {
+        HttpRequest.Builder builder =
+                HttpRequest.newBuilder(URI.create(baseUrl + path))
+                        .GET();
+        return send(builder, authorization);
+    }
+
+    private ResponseEntity<String>
+    forwardDelete(
+            String baseUrl,
+            String path,
+            String authorization) {
+        HttpRequest.Builder builder =
+                HttpRequest.newBuilder(URI.create(baseUrl + path))
+                        .DELETE();
+        return send(builder, authorization);
+    }
+
 }
