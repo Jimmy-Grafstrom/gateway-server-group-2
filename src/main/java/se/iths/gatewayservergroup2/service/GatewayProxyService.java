@@ -148,5 +148,21 @@ public class GatewayProxyService {
                         .DELETE();
         return send(builder, authorization);
     }
-// ======================================================
+// ================================================ AUTH =========================================
+
+    public ResponseEntity<String> login(String requestBody, String contentType) {
+        return forwardPost(authServerUrl, "/auth/login", requestBody, null, contentType);
+    }
+
+    public ResponseEntity<String> register(String requestBody, String contentType) {
+        return forwardPost(authServerUrl, "/auth/register", requestBody, null, contentType);
+    }
+
+    public ResponseEntity<String> getJwks() {
+        return forwardGet(authServerUrl, "/auth/jwks", null);
+    }
+
+
+//===================================================================================================
+
 }
