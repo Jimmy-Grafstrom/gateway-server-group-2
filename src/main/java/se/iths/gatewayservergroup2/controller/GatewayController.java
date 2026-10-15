@@ -69,4 +69,21 @@ public class GatewayController {
                 request.getHeader(HttpHeaders.AUTHORIZATION)
         );
     }
+
+    //==================================AUTH-service endpoints============================================
+
+    @PostMapping("/auth/login")
+    public ResponseEntity<String> login(@RequestBody String requestBody, HttpServletRequest request) {
+        return proxyService.login(requestBody, request.getHeader(HttpHeaders.CONTENT_TYPE));
+    }
+
+    @PostMapping("/auth/register")
+    public ResponseEntity<String> register(@RequestBody String requestBody, HttpServletRequest request) {
+        return proxyService.register(requestBody, request.getHeader(HttpHeaders.CONTENT_TYPE));
+    }
+
+    @GetMapping("/auth/jwks")
+    public ResponseEntity<String> getJwks() {
+        return proxyService.getJwks();
+    }
 }
