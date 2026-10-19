@@ -1,5 +1,6 @@
 package se.iths.gatewayservergroup2.controller;
 
+import org.springframework.http.HttpStatus;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -104,6 +105,17 @@ public class GatewayController {
     @PostMapping("/auth/logout")
     public ResponseEntity<Void> logout() {
         return proxyService.logout();
+    }
+
+    @GetMapping("/auth/me")
+    public ResponseEntity<String> me(
+            @CookieValue(name = "access_token", required = false) String accessToken) {
+
+        String authorization = toBearerHeader(accessToken);
+        if (authorization == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return proxyService.getMe(authorization);
     }
 
     private String toBearerHeader(String accessToken) {

@@ -180,6 +180,10 @@ public class GatewayProxyService {
         return forwardGet(authServerUrl, "/auth/jwks", null);
     }
 
+    public ResponseEntity<String> getMe(String authorization) {
+        return forwardGet(authServerUrl, "/auth/me", authorization);
+    }
+
     public ResponseEntity<Void> logout() {
         ResponseCookie cookie = ResponseCookie.from("access_token", "")
                 .httpOnly(true)
