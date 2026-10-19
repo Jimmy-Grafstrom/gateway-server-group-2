@@ -16,10 +16,14 @@ public class GatewayController {
     }
 
     @PostMapping("/order")
-    public ResponseEntity<String> createOrder(@RequestBody String requestBody, HttpServletRequest request) {
+    public ResponseEntity<String> createOrder(
+            @RequestBody String requestBody,
+            @CookieValue(name = "access_token", required = false) String accessToken,
+            HttpServletRequest request)
+    {
         return proxyService.createOrder(
                 requestBody,
-                request.getHeader(HttpHeaders.AUTHORIZATION),
+                toBearerHeader(accessToken),
                 request.getHeader(HttpHeaders.CONTENT_TYPE)
         );
     }
@@ -27,11 +31,12 @@ public class GatewayController {
     @PostMapping("/payment/checkout")
     public ResponseEntity<String> createPaymentCheckout(
             @RequestBody String requestBody,
+            @CookieValue(name = "access_token", required = false) String accessToken,
             HttpServletRequest request
     ) {
         return proxyService.createPaymentCheckout(
                 requestBody,
-                request.getHeader(HttpHeaders.AUTHORIZATION),
+                toBearerHeader(accessToken),
                 request.getHeader(HttpHeaders.CONTENT_TYPE)
         );
     }
@@ -39,42 +44,51 @@ public class GatewayController {
     // =============== Product Service Endpoints ==============
 
     @GetMapping("/products")
-    public ResponseEntity<String> getAllProducts(HttpServletRequest request) {
-        return proxyService.getAllProducts(
-                request.getHeader(HttpHeaders.AUTHORIZATION)
+    public ResponseEntity<String> getAllProducts(
+            @CookieValue(name = "access_token", required = false) String accessToken,
+            HttpServletRequest request)
+    {
+        return proxyService.getAllProducts(toBearerHeader(accessToken)
         );
     }
 
     @GetMapping("/products/{id}")
-    public ResponseEntity<String> getProductById(@PathVariable Long id, HttpServletRequest request) {
-        return proxyService.getProductById(
-                id,
-                request.getHeader(HttpHeaders.AUTHORIZATION)
-        );
+    public ResponseEntity<String> getProductById(
+            @PathVariable Long id,
+            @CookieValue(name = "access_token", required = false) String accessToken,
+            HttpServletRequest request)
+    {
+        return proxyService.getProductById(id, toBearerHeader(accessToken));
     }
 
     @PostMapping("/products/add")
-    public ResponseEntity<String> addProduct(@RequestBody String requestBody, HttpServletRequest request) {
+    public ResponseEntity<String> addProduct(
+            @RequestBody String requestBody,
+            @CookieValue(name = "access_token", required = false) String accessToken,
+            HttpServletRequest request)
+    {
         return proxyService.addProduct(
                 requestBody,
-                request.getHeader(HttpHeaders.AUTHORIZATION),
+                toBearerHeader(accessToken),
                 request.getHeader(HttpHeaders.CONTENT_TYPE)
         );
     }
 
     @DeleteMapping("/products/delete/{id}")
-    public ResponseEntity<String> deleteProduct(@PathVariable Long id, HttpServletRequest request) {
-        return proxyService.deleteProduct(
-                id,
-                request.getHeader(HttpHeaders.AUTHORIZATION)
+    public ResponseEntity<String> deleteProduct(
+            @PathVariable Long id,
+            @CookieValue(name = "access_token", required = false) String accessToken,
+            HttpServletRequest request)
+    {
+        return proxyService.deleteProduct(id, toBearerHeader(accessToken)
         );
     }
 
     //==================================AUTH-service endpoints============================================
 
     @PostMapping("/auth/login")
-    public ResponseEntity<String> login(@RequestBody String requestBody, HttpServletRequest request) {
-        return proxyService.login(requestBody, request.getHeader(HttpHeaders.CONTENT_TYPE));
+    public ResponseEntity<?> login(@RequestBody String requestBody, HttpServletRequest request) {
+        return proxyService.loginWithCookie(requestBody, request.getHeader(HttpHeaders.CONTENT_TYPE));
     }
 
     @PostMapping("/auth/register")
@@ -85,5 +99,14 @@ public class GatewayController {
     @GetMapping("/auth/jwks")
     public ResponseEntity<String> getJwks() {
         return proxyService.getJwks();
+    }
+
+    @PostMapping("/auth/logout")
+    public ResponseEntity<Void> logout() {
+        return proxyService.logout();
+    }
+
+    private String toBearerHeader(String accessToken) {
+        return (accessToken != null && !accessToken.isBlank()) ? "Bearer " + accessToken : null;
     }
 }
